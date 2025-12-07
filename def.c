@@ -1,0 +1,15 @@
+#define MAXSTP 1000000000
+#define TINY 1.0e-30
+#define SAFETY 0.9
+#define PGROW -0.2
+#define PSHRNK -0.25
+#define ERRCON 1.89e-4
+#define PI 3.141592653589793
+#define E 2.7182818
+#define KMAXX 8
+#define IMAXX (KMAXX+1)
+#define SAFE1 0.25
+#define SAFE2 0.7
+#define REDMAX 1.0e-5
+#define REDMIN 0.7
+#define SCALMX 0.1

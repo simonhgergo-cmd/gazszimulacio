@@ -1,1 +1,1 @@
-# g-zszimul-ci-
+# gazszimulacio

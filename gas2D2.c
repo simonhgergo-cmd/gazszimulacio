@@ -137,8 +137,6 @@ void getdiff (double t, double **st, double **ds)
   inthewall=0;
   touching=0;
 
-  //printf("in getdiff\n");
-
    for (k=0; k<dim2; k++)
     {
       ds[0][k]=st[2][k]; //dx/dt=vx
@@ -161,14 +159,12 @@ void getdiff (double t, double **st, double **ds)
     double Fdmp = (st[2][k] < 0) ? -c*st[2][k] : 0;
 	  ds[2][k]+=-Dcoeff*left/mass + Fdmp/mass;
 	  inthewall++;
-    //printf("left   %.6f %.6f %.6f %.6f %.6f %.6f %.6f\n", st[0][k], st[1][k], c, st[2][k], left, -Dcoeff*left, Fdmp);
 	}
       if (right>0)
 	{
     double Fdmp = (st[2][k] > 0) ? -c*st[2][k] : 0;
 	  ds[2][k]+=-Dcoeff*right/mass + Fdmp / mass;
 	  inthewall++;
-    //printf("right   %d %d %d %d\n", st[2][k], left, -Dcoeff*left, Fdmp);
 	}
 
       if (down<0)
@@ -176,7 +172,6 @@ void getdiff (double t, double **st, double **ds)
     double Fdmp = (st[3][k] < 0) ? -c*st[3][k] : 0;
 	  ds[3][k]+=-Dcoeff*down/mass + Fdmp/mass;
 	  inthewall++;
-    //printf("down   %.6f %.6f\n", -Dcoeff*down, Fdmp);
 	}
 
       if (up>0)
@@ -184,7 +179,6 @@ void getdiff (double t, double **st, double **ds)
     double Fdmp = (st[3][k] > 0) ? -c*st[3][k] : 0;
 	  ds[3][k]+=-Dcoeff*up/mass + Fdmp / mass;
 	  inthewall++;
-    //printf("up   %.6f %.6f\n", -Dcoeff*up, Fdmp);
 	}
     }
 
@@ -193,15 +187,16 @@ void getdiff (double t, double **st, double **ds)
         grid_count[i][j] = 0;
       }
     }
-    // --- constants for cell geometry ---
-    const int nx = (int)(xlimit / box_width);
-    const int ny = (int)(ylimit / box_width);
+    int nx = (int)(xlimit / box_width);
+    int ny = (int)(ylimit / box_width);
     int cx, cy;
     for (int p = 0; p < dim2; ++p) {
         int cx = (int)(st[0][p] / box_width);
         int cy = (int)(st[1][p] / box_width);
-        if (cx < 0) cx = 0; if (cx >= nx) cx = nx - 1;
-        if (cy < 0) cy = 0; if (cy >= ny) cy = ny - 1;
+        if (cx < 0) cx = 0;
+        if (cx >= nx) cx = nx - 1;
+        if (cy < 0) cy = 0;
+        if (cy >= ny) cy = ny - 1;
 
         int pos = grid_count[cx][cy]++;
         if (pos < dim2) grid[cx][cy][pos] = p;
@@ -256,7 +251,6 @@ void getdiff (double t, double **st, double **ds)
 	          ds[3][k]+=Fy;
 	          ds[3][i]+=-Fy;
             }
-	        //}
           count++;
 	    }
     }
@@ -299,7 +293,6 @@ void getdiff (double t, double **st, double **ds)
 	          ds[3][k]+=Fy;
 	          ds[3][i]+=-Fy;
             }
-	        //}
           count++;
       }
   }
@@ -312,7 +305,6 @@ void getdiff (double t, double **st, double **ds)
           ds[3][i] += -g_accel;
         }
       }
-   // printf("%g %g\n",ds[0][10],st[2][10]);
 
 
 double energy (double **st)
@@ -388,7 +380,6 @@ double energy (double **st)
               double r7 = r6 * r;
               potential += 4*epsilon*1e-21*((sgm12/ r6 / r6) - (sgm6 / r6));
             }
-	        //}
           count++;
 	    }
     }
@@ -421,7 +412,6 @@ double energy (double **st)
               double r7 = r6 * r;
               potential += 4*epsilon*1e-21*((sgm12/ r6 / r6) - (sgm6 / r6));
             }
-	        //}
           count++;
       }
   }
@@ -546,28 +536,6 @@ void initialize ()
 
       printf("%f %f \n", distr[2][k], distr[3][k]);
     }
-  /*
-    //triviális ellenőrzések
-  distr[0][0]=100.0;
-  distr[1][0]=100.0;
-  distr[2][0]=0.0;
-  distr[3][0]=-2.0;
-
-  //distr[0][1]=100.0;
-  //distr[1][1]=100.0;
-  //distr[2][1]=0.0;
-  //distr[3][1]=0.0;
-  
-
-  //for (i=0; i<dim2; i++)
-  //  {
-  //    for (k=0; k<dim2; k++)
-	//{
-	//  dx[i][k]=distr[0][i]-distr[0][k];
-	//  dy[i][k]=distr[1][i]-distr[1][k];
-	//  pairdist[i][k]=sqrt(dx[i][k]*dx[i][k]+dy[i][k]*dy[i][k]);
-	//}
-  //  }*/
 }
 
 
@@ -586,7 +554,6 @@ void getnumbers()
   double denominator = sqrt(pi*pi + log_we*log_we);
   double sqrt_term = sqrt(Dcoeff * mass);
 
-  // Derived spatial quantities
   spfb1D = 2 * sigma;
   spaceforaball = spfb1D * spfb1D;
   printf("Maximal number of balls: %g\n", maxball);
@@ -595,7 +562,6 @@ void getnumbers()
 
   dim2 = Nballs;
 
-  // Lennard–Jones potential parameters for water
   diameter = sigma;         // Å
 }
 
@@ -611,40 +577,38 @@ int main(int argc, char *argv[])
 
   Dcoeff = atof(argv[1]);
   sim_radius = atof(argv[2]);
-  molecule_e = atof(argv[3]); // percentage of the loss of energy for the two interacting molecules
-  wall_e = atof(argv[4]); // same for wall and molecule interaction
-  mass = atof(argv[5]);             // 1 H2O molecule = 17.9 m_p
+  molecule_e = atof(argv[3]);
+  wall_e = atof(argv[4]);
+  mass = atof(argv[5]);
 
-  radius = atof(argv[6]);          // Å, ≈ σ/2
-   // Å
+  radius = atof(argv[6]);
   dim1 = atof(argv[7]);
   seed = atoi(argv[8]);
 
-  // Simulation box dimensions (Å)
-  xlimit = atof(argv[9]);          // ~100 × σ
+  // Simulation box dimensions
+  xlimit = atof(argv[9]);
   ylimit = atof(argv[10]);
   box_width = atof(argv[11]);
 
-  // Derived spatial quantities
   spfb1D = 2 * sigma;
   spaceforaball = spfb1D * spfb1D;
   maxball = atof(argv[12]);
   Nballs = atoi(argv[13]);
   
-  maxspeed = atof(argv[14]);       // Å/ps
-  minspeed = atof(argv[15]);       // Å/ps
+  maxspeed = atof(argv[14]);       // angström/ps
+  minspeed = atof(argv[15]);       // angström/ps
 
   start = atof(argv[16]);
-  stop = atof(argv[17]);             // ns total simulation time
-  dxsav = atof(argv[18]);            // output interval (x)
-  h = atof(argv[19]);              // integration step (ns)
+  stop = atof(argv[17]);             // ps total simulation time
+  dxsav = atof(argv[18]);
+  h = atof(argv[19]);              // integration step (ps)
   eps = atof(argv[20]);            // precision
   dim2 = Nballs;
 
   // Lennard–Jones potential parameters for water
   epsilon = atof(argv[21]); //*1e-21 J
   sigma   = atof(argv[22]); //angström
-  diameter = sigma;         // Å
+  diameter = sigma;         // angström
   
   getnumbers ();
 
